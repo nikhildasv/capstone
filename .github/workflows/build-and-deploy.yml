@@ -72,8 +72,8 @@ jobs:
 
       - name: Push images to the local registry
         run: |
-          docker push "$REGISTRY/capstone-api:${{ steps.tag.outputs.tag }}"
-          docker push "$REGISTRY/capstone-web:${{ steps.tag.outputs.tag }}"
+          docker push "$LOCAL_REGISTRY/capstone-api:${{ steps.tag.outputs.tag }}"
+          docker push "$LOCAL_REGISTRY/capstone-web:${{ steps.tag.outputs.tag }}"
 
       - name: Push images to Docker Hub
         run: |
