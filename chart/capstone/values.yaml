@@ -8,7 +8,7 @@
 api:
   image:
     repository: localhost:5000/capstone-api
-    tag: "6ffbe16"
+    tag: "8241a62"
   hpa:
     minReplicas: 2
     maxReplicas: 6
@@ -16,7 +16,7 @@ api:
 web:
   image:
     repository: localhost:5000/capstone-web
-    tag: "6ffbe16"
+    tag: "8241a62"
   replicaCount: 2
 redis:
   image: redis:7-alpine
