@@ -32,7 +32,8 @@ jobs:
   build-push-bump:
     runs-on: self-hosted
     env:
-      REGISTRY: localhost:5000
+      REGISTRY: localhost:5000        
+      DOCKERHUB_IMAGE: nikhildas2005/capstone
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,17 +41,44 @@ jobs:
       - name: Compute image tag (short SHA)
         id: tag
         run: echo "tag=${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
+        
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKER_USER }}
 
       - name: Build api image
-        run: docker build -t "$REGISTRY/capstone-api:${{ steps.tag.outputs.tag }}" app/api
+        run: |
+          docker build \
+            -t "$LOCAL_REGISTRY/capstone-api:${{ steps.tag.outputs.tag }}" \
+            app/api
+
+          docker tag \
+            "$LOCAL_REGISTRY/capstone-api:${{ steps.tag.outputs.tag }}" \
+            "$DOCKERHUB_IMAGE:api-${{ steps.tag.outputs.tag }}"
+      
+        
 
       - name: Build web image
-        run: docker build -t "$REGISTRY/capstone-web:${{ steps.tag.outputs.tag }}" app/web
+        run: |
+          docker build \
+            -t "$LOCAL_REGISTRY/capstone-web:${{ steps.tag.outputs.tag }}" \
+            app/web
+
+          docker tag \
+            "$LOCAL_REGISTRY/capstone-web:${{ steps.tag.outputs.tag }}" \
+            "$DOCKERHUB_IMAGE:web-${{ steps.tag.outputs.tag }}"
 
       - name: Push images to the local registry
         run: |
           docker push "$REGISTRY/capstone-api:${{ steps.tag.outputs.tag }}"
           docker push "$REGISTRY/capstone-web:${{ steps.tag.outputs.tag }}"
+
+      - name: Push images to Docker Hub
+        run: |
+          docker push "$DOCKERHUB_IMAGE:api-${{ steps.tag.outputs.tag }}"
+          docker push "$DOCKERHUB_IMAGE:web-${{ steps.tag.outputs.tag }}"
 
       - name: Bump chart/capstone/values.yaml
         run: |
