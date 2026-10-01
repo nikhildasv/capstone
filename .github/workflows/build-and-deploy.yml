@@ -32,7 +32,7 @@ jobs:
   build-push-bump:
     runs-on: self-hosted
     env:
-      REGISTRY: localhost:5000        
+      LOCAL_REGISTRY: localhost:5000        
       DOCKERHUB_IMAGE: nikhildas2005/capstone
     steps:
       - name: Checkout
